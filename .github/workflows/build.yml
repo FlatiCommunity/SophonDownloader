@@ -14,7 +14,16 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: "Init/update submodules"
+        run: |
+          git submodule sync --recursive
+          git submodule update --init --recursive
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -22,11 +31,11 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Restore
-        run: dotnet restore Sophon.Downloader.sln
+        run: dotnet restore
         working-directory: Sophon.Downloader
 
       - name: Build
-        run: dotnet build Sophon.Downloader.sln -c Release
+        run: dotnet build -c Release
         working-directory: Sophon.Downloader
 
       - name: Upload Artifact
